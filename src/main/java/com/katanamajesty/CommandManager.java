@@ -55,8 +55,8 @@ public class CommandManager extends ListenerAdapter {
         CommandData unlink = new CommandData("unlink", "Unlink GW2 account from Discord");
         // TODO: 23.08.2021 WIP
         CommandData _account = new CommandData("account", "Retrieve all public information about the account")
-                .addOptions(new OptionData(OptionType.USER, "участник", "Get information about this player").setRequired(true),
-                            new OptionData(OptionType.STRING, "аргумент", "Additional account information"));
+                .addOptions(new OptionData(OptionType.USER, "member", "Get information about this player").setRequired(true),
+                            new OptionData(OptionType.STRING, "argument", "Additional account information"));
         updateAction.addCommands(link, unlink, _account).queue();
 
         /*
