@@ -27,7 +27,7 @@ public class UnlinkDiscordCommand extends GWLinker implements SlashCommand, Clic
         }
         event.reply(String.format("Unlink this Discord account from GW2 by deleting API-key ||%s|| from bot database?", getGWToken(member)))
                 .setEphemeral(true)
-                .addActionRow(Button.success("unlink_button", "Unlink")
+                .addActionRow(Button.danger("unlink_button", "Unlink")
                         .withEmoji(Emoji.fromEmote(emote)))
                 .queue();
     }
