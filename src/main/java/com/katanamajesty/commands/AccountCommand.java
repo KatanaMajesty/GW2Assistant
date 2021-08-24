@@ -1,10 +1,13 @@
 package com.katanamajesty.commands;
 
 import com.katanamajesty.api.v2.account.Account;
+import com.katanamajesty.exceptions.NoneAccessAccountException;
 import com.katanamajesty.modules.GWLinker;
+import com.katanamajesty.modules.format.GWEmoji;
 import com.katanamajesty.types.ClickableButton;
 import com.katanamajesty.CommandManager;
 import com.katanamajesty.types.SlashCommand;
+import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -36,20 +39,28 @@ public class AccountCommand implements SlashCommand, ClickableButton {
         Account account = new Account(gw2Token);
         if (options.size() != 2) {
             EmbedBuilder builder = new EmbedBuilder();
-            builder.addField("Player", account.getName(), true);
-            builder.addField("GUID", account.getGUID(), true);
+            builder.setAuthor("Account statistics");
+            builder.setTitle(String.format("Player: *%s*", account.getName()));
+            builder.setDescription(String.format("*GUID*: `%s`", account.getGUID()));
             builder.addField("World", account.getWorld(), true);
             builder.addField("Total In-game Time", account.getAge(), true);
             builder.addField("Creation Date", account.getCreatedTimestamp(), true);
-            builder.addField("Game Access", account.getAccess(), true);
+            builder.addField("Game Access", getAccessString(account.getAccess()), true);
             builder.addField("Guilds", account.getGuilds(), true);
-            builder.addField("Fractal Level", account.getFractalLevel(), true);
-            builder.addField("Daily Achievement Points", account.getDailyAchievementPoints(), true);
-            builder.addField("Monthly Achievement Points", account.getMonthlyAchievementPoints(), true);
-            builder.addField("WVW Rank", account.getWVWRank(), true);
-            builder.setTitle("Account statistics");
+            builder.addField("Fractal Level", GWEmoji.addEmojiToString(
+                    GWEmoji.FRACTAL_RELIC, account.getFractalLevel() + " Fractal Level"
+            ), true);
+            builder.addField("Daily Achievement Points", GWEmoji.addEmojiToString(
+                    GWEmoji.ACHIEVEMENT_POINT,
+                    account.getMonthlyAchievementPoints() + " AP"), true);
+            builder.addField("Monthly Achievement Points",
+                    GWEmoji.addEmojiToString(
+                            GWEmoji.ACHIEVEMENT_POINT,
+                            account.getMonthlyAchievementPoints() + " AP"), true);
+            builder.addField("WVW Rank", getWVWString(account.getWVWRank()), true);
             builder.setFooter(member.getUser().getAsTag(), member.getUser().getAvatarUrl());
             builder.setTimestamp(Instant.now());
+            builder.setThumbnail("https://cdn.discordapp.com/attachments/879782344905596939/879782379433099274/gw2_logo.png");
             event.replyEmbeds(builder.build()).queue();
             return;
         }
@@ -75,4 +86,32 @@ public class AccountCommand implements SlashCommand, ClickableButton {
     ==============================
      */
 
+    /**
+     * :emoji: Tier wvwRank Avenger
+     * @param wvwRank wvwRank
+     * @return :emoji: Tier wvwRank Avenger lol
+     */
+    private static String getWVWString(String wvwRank) {
+        int rank = Integer.parseInt(wvwRank);
+        wvwRank = String.format("Tier %s Avenger", wvwRank);
+        switch (rank) {
+            case 1 -> wvwRank = GWEmoji.getEmojiFromLong(GWEmoji.WVW_TIER_1_AVENGER) + wvwRank;
+            case 2 -> wvwRank = GWEmoji.getEmojiFromLong(GWEmoji.WVW_TIER_2_AVENGER) + wvwRank;
+            case 3 -> wvwRank = GWEmoji.getEmojiFromLong(GWEmoji.WVW_TIER_3_AVENGER) + wvwRank;
+            case 4 -> wvwRank = GWEmoji.getEmojiFromLong(GWEmoji.WVW_TIER_4_AVENGER) + wvwRank;
+            case 5 -> wvwRank = GWEmoji.getEmojiFromLong(GWEmoji.WVW_TIER_5_AVENGER) + wvwRank;
+        }
+        return wvwRank;
+    }
+
+    @SneakyThrows(NoneAccessAccountException.class)
+    private static String getAccessString(String access) {
+        String result = "Trial Version of GW2";
+        if (access.contains("None")) throw new NoneAccessAccountException();
+        if (access.contains("GuildWars2")) result = "Full Version of GW2";
+        if (access.contains("HeartOfThorns")) result = result + "\nDLC: *Heart Of Thorns*";
+        if (access.contains("PathOfFire")) result = result + "\nDLC: *Path Of Fire*";
+        if (access.contains("EndOfDragons")) result = result + "\nDLC: *End Of Dragons*";
+        return result;
+    }
 }
