@@ -50,13 +50,13 @@ public class CommandManager extends ListenerAdapter {
         commandConcurrentMap.put("account", new AccountCommand());
 
         CommandListUpdateAction updateAction = Discord.getJda().updateCommands();
-        CommandData link = new CommandData("link", "Привязать GW2 аккаунт к Дискорду")
-                .addOptions(new OptionData(OptionType.STRING, "api-key", "https://account.arena.net/applications").setRequired(true));
-        CommandData unlink = new CommandData("unlink", "Отвязать GW2 аккаунт от Дискорда");
+        CommandData link = new CommandData("link", "Link GW2 account to Discord")
+                .addOptions(new OptionData(OptionType.STRING, "api-key", "get on https://account.arena.net/applications").setRequired(true));
+        CommandData unlink = new CommandData("unlink", "Unlink GW2 account from Discord");
         // TODO: 23.08.2021 WIP
-        CommandData _account = new CommandData("account", "Получить всю доступную информацию об аккаунте")
-                .addOptions(new OptionData(OptionType.USER, "участник", "Показать информацию об этом участнике").setRequired(true),
-                            new OptionData(OptionType.STRING, "аргумент", "Дополнительная информация об аккаунте"));
+        CommandData _account = new CommandData("account", "Retrieve all public information about the account")
+                .addOptions(new OptionData(OptionType.USER, "участник", "Get information about this player").setRequired(true),
+                            new OptionData(OptionType.STRING, "аргумент", "Additional account information"));
         updateAction.addCommands(link, unlink, _account).queue();
 
         /*
